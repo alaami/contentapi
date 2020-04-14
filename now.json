@@ -1,7 +1,4 @@
 {
   "name": "contentapi",
-  "version": 2,
-  "env": {
-    "MONGODB_URI": "@my-mongodb-uri"
-  }
+  "version": 2
 }
