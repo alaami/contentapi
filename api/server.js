@@ -4,7 +4,7 @@ const bodyParser = require('body-parser');
 const cors = require('cors');
 const app = express();
 const port = 8000;
-const Article = require('./models/article');
+const Article = require('../models/article');
 //Auth
 const jwt = require("express-jwt"); // NEW
 const jwksRsa = require("jwks-rsa"); // NEW
@@ -16,7 +16,7 @@ app.use(express.urlencoded({ extended: true }));
 
 //Connect to mongoDB
 var mongoose   = require('mongoose');
-mongoose.connect('mongodb+srv://exp_user:abcd1234@cluster0-eajrv.mongodb.net/express_db?retryWrites=true&w=majority'); // connect to our database
+mongoose.connect(process.env.MONGODB_URI); // connect to our database
 
 // Set up Auth0 configuration 
 const authConfig = {
