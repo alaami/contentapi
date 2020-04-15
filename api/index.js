@@ -3,7 +3,7 @@
 const Article = require('../models/article');
 //Connect to mongoDB
 var mongoose   = require('mongoose');
-mongoose.connect(process.env.MONGODB_URI || 'mongodb+srv://exp_user:abcd1234@cluster0-eajrv.mongodb.net/express_db?retryWrites=true');
+mongoose.connect(process.env.MONGODB_URI);
 
 module.exports = async (req, res) => {
           Article.find(function(err, articles) {
