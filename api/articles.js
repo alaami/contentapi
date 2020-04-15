@@ -1,4 +1,5 @@
 const Article = require('../models/article');
+const url = require('url')
 
 //Connect to mongoDB
 var mongoose   = require('mongoose');
