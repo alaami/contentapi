@@ -129,6 +129,6 @@ router.route('/articles')
         });
 // REGISTER OUR ROUTES -------------------------------
 // all of our routes will be prefixed with /api
-app.use('/api', router);
+app.use('/', router);
 // listen on the port
 app.listen(port);
