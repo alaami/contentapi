@@ -4,7 +4,7 @@ const bodyParser = require('body-parser');
 const cors = require('cors');
 const app = express();
 const port = 8000;
-const Article = require('../models/article');
+const Article = require('./models/article');
 //Auth
 const jwt = require("express-jwt"); // NEW
 const jwksRsa = require("jwks-rsa"); // NEW
