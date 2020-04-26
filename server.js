@@ -3,12 +3,9 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const cors = require('cors');
 const app = express();
-const port = 8000;
+require('dotenv').config();
+const port = process.env.port || 8000;
 const Article = require('./models/article');
-//Auth
-const jwt = require("express-jwt");
-const jwksRsa = require("jwks-rsa"); 
-const jwtAuthz = require('express-jwt-authz');
 
 
 app.use(bodyParser.json());
@@ -17,32 +14,10 @@ app.use(express.urlencoded({ extended: true }));
 
 //Connect to mongoDB
 var mongoose   = require('mongoose');
-mongoose.connect(process.env.MONGODB_URI || 'mongodb+srv://exp_user:abcd1234@cluster0-eajrv.mongodb.net/express_db?retryWrites=true'); // connect to our database
-
-// Set up Auth0 configuration 
-const authConfig = {
-    domain: "dev-portfolioid.auth0.com",
-    audience: "http://localhost:8000/api"
-  };
-// Create middleware to validate the JWT using express-jwt
-const checkJwt = jwt({
-    // Provide a signing key based on the key identifier in the header and the signing keys provided by your Auth0 JWKS endpoint.
-    secret: jwksRsa.expressJwtSecret({
-      cache: true,
-      rateLimit: true,
-      jwksRequestsPerMinute: 5,
-      jwksUri: `https://${authConfig.domain}/.well-known/jwks.json`
-    }),
-    // Validate the audience (Identifier) and the issuer (Domain).
-    audience: authConfig.audience,
-    issuer: `https://${authConfig.domain}/`,
-    algorithm: ["RS256"]
-  });  
+mongoose.connect(process.env.MONGODB_URI); // connect to our database
 
 
-// ROUTES FOR OUR API
-// =============================================================================
-const router = express.Router();              // get an instance of the express Router
+const router = express.Router();             
 
 // middleware to use for all requests
 router.use(function(req, res, next) {
@@ -51,26 +26,24 @@ router.use(function(req, res, next) {
     next(); // make sure we go to the next routes and don't stop here
 });
 
-// test route to make sure everything is working (accessed at GET http://localhost:8080/api)
 router.get('/', (req, res) => {
   res.send(`Hi! Server is listening on port ${port}`)
 });
 
-// more routes for our API will happen here
 router.route('/articles')
-
     // create article (accessed at POST )
     .post(function(req, res) {
-
       var article = new Article();      // create a new instance of the Article model
-      article.name = req.body.name;  // set the article name (comes from the request)
+      article.title = req.body.title;  // set the article name (comes from the request)
       article.description = req.body.description;  
-      // save the bear and check for errors
+      article.link=req.body.title;
+      article.content=req.body.content;
+      article.image.url=req.body.image;
       article.save(function(err) {
           if (err)
               res.send(err);
-
-          res.json({ message: 'Article created!' });
+          else
+              res.json({ message: 'Article created!' });
 
     });
   })
@@ -79,39 +52,37 @@ router.route('/articles')
         Article.find(function(err, articles) {
             if (err)
                 res.send(err);
-            res.json(articles);
+            else
+                res.json(articles);
         });
     });
 
     // route ended with 
     router.route('/article/:article_id')
-
-    // get the bear with that id (accessed at GET http://localhost:8080/api/bears/:bear_id)
     .get(function(req, res) {
         Article.findById(req.params.article_id, function(err, article) {
             if (err)
                 res.send(err);
-            res.json(article);
-        });
-        
+            else
+                res.json(article);
+        });        
     })
-    // update
     .put(function(req, res) {
 
         // use our bear model to find the bear we want
         Article.findById(req.params.article_id, function(err, article) {
 
-            if (err)
-                res.send(err);
-
-            article.name = req.body.name;  
-            article.description = req.body.description;  
+            article.title = req.body.title;  
+            article.description = req.body.description; 
+            article.link = req.body.title; 
+            article.content=req.body.content;
+            article.image.url=req.body.image;  
             // save the bear
             article.save(function(err) {
                 if (err)
                     res.send(err);
-
-                res.json({ message: 'Article updated!' });
+                else
+                    res.json({ message: 'Article updated!' });
             });
         })
     })
@@ -122,12 +93,11 @@ router.route('/articles')
             }, function(err, article) {
                 if (err)
                     res.send(err);
-    
-                res.json({ message: 'Successfully deleted' });
+                else
+                    res.json({ message: 'Successfully deleted' });
             });
         });
 // REGISTER OUR ROUTES -------------------------------
 // all of our routes will be prefixed with /api
 app.use('/api', router);
-// listen on the port
 app.listen(port);
