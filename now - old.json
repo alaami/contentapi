@@ -1,0 +1,13 @@
+{
+  "name": "contentapi",
+  "version": 2,
+  "builds": [
+    { "src": "/src/lambdas/article.js", "use": "@now/node" }
+  ],
+  "routes": [
+    { "src": "/article/(.*)", "dest": "/src/lambdas/article.js" }
+  ],
+    "env": {
+    "MONGODB_URI": "@my-mongodb-uri"
+  }
+}

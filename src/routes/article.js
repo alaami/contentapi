@@ -1,26 +1,16 @@
-// server/server.js
-const express = require('express');
+const { Router } = require('express');
+const Article = require('../models/article');
 const bodyParser = require('body-parser');
-const cors = require('cors');
-const app = express();
-const port = 8000;
-const Article = require('./models/article');
 //Auth
-const jwt = require("express-jwt");
-const jwksRsa = require("jwks-rsa"); 
-const jwtAuthz = require('express-jwt-authz');
+/*const jwt = require("express-jwt"); // NEW
+const jwksRsa = require("jwks-rsa"); // NEW*/
 
 
-app.use(bodyParser.json());
-app.use(cors());
-app.use(express.urlencoded({ extended: true }));
-
-//Connect to mongoDB
-var mongoose   = require('mongoose');
-mongoose.connect(process.env.MONGODB_URI || 'mongodb+srv://exp_user:abcd1234@cluster0-eajrv.mongodb.net/express_db?retryWrites=true'); // connect to our database
-
+const router = Router();
+// add your middleware here so it will be used on dev server too
+//router.use(AuthHandler);
 // Set up Auth0 configuration 
-const authConfig = {
+/*const authConfig = {
     domain: "dev-portfolioid.auth0.com",
     audience: "http://localhost:8000/api"
   };
@@ -33,29 +23,29 @@ const checkJwt = jwt({
       jwksRequestsPerMinute: 5,
       jwksUri: `https://${authConfig.domain}/.well-known/jwks.json`
     }),
+  
     // Validate the audience (Identifier) and the issuer (Domain).
     audience: authConfig.audience,
     issuer: `https://${authConfig.domain}/`,
     algorithm: ["RS256"]
   });  
-
-
-// ROUTES FOR OUR API
-// =============================================================================
-const router = express.Router();              // get an instance of the express Router
-
-// middleware to use for all requests
-router.use(function(req, res, next) {
-    // do logging
-    console.log('Something is happening.');
-    next(); // make sure we go to the next routes and don't stop here
-});
-
+*/
+router.use(bodyParser.json());
+// endpoints in route
 // test route to make sure everything is working (accessed at GET http://localhost:8080/api)
-router.get('/', (req, res) => {
-  res.send(`Hi! Server is listening on port ${port}`)
+router.get('/', async(req, res) => {
+  res.send(`Hi! Server is listening`)
 });
 
+router.get('/articles', async (req, res) => {
+
+	        await Article.find(function(err, articles) {
+            if (err)
+                res.send(err);
+            res.json(articles);
+        });
+		});
+		/*
 // more routes for our API will happen here
 router.route('/articles')
 
@@ -84,7 +74,7 @@ router.route('/articles')
     });
 
     // route ended with 
-    router.route('/article/:article_id')
+    router.route('/:article_id')
 
     // get the bear with that id (accessed at GET http://localhost:8080/api/bears/:bear_id)
     .get(function(req, res) {
@@ -126,8 +116,6 @@ router.route('/articles')
                 res.json({ message: 'Successfully deleted' });
             });
         });
-// REGISTER OUR ROUTES -------------------------------
-// all of our routes will be prefixed with /api
-app.use('/api', router);
-// listen on the port
-app.listen(port);
+// ...more endpoints...
+*/
+module.exports = router;
