@@ -33,12 +33,14 @@ router.get('/', (req, res) => {
 router.route('/articles')
     // create article (accessed at POST )
     .post(function(req, res) {
-      var article = new Article();      // create a new instance of the Article model
-      article.title = req.body.title;  // set the article name (comes from the request)
-      article.description = req.body.description;  
-      article.link=req.body.title;
-      article.content=req.body.content;
-      article.image.url=req.body.image;
+      var article = new Article({
+          title:req.body.title,
+          description:req.body.description,
+          link:req.body.title,
+          content:req.body.content,
+          image:{url:req.body.image}
+
+      });
       article.save(function(err) {
           if (err)
               res.send(err);
@@ -58,9 +60,10 @@ router.route('/articles')
     });
 
     // route ended with 
-    router.route('/article/:article_id')
+    router.route('/article/:link')
     .get(function(req, res) {
-        Article.findById(req.params.article_id, function(err, article) {
+        Article.find({'link': req.params.link}, function(err, article) {
+            
             if (err)
                 res.send(err);
             else
@@ -69,27 +72,22 @@ router.route('/articles')
     })
     .put(function(req, res) {
 
-        // use our bear model to find the bear we want
-        Article.findById(req.params.article_id, function(err, article) {
-
-            article.title = req.body.title;  
-            article.description = req.body.description; 
-            article.link = req.body.title; 
-            article.content=req.body.content;
-            article.image.url=req.body.image;  
-            // save the bear
-            article.save(function(err) {
+        Article.findOneAndUpdate({'link': req.params.link}, {title:req.body.title,
+        description:req.body.description,
+        link:req.body.title,
+        content:req.body.content,
+        image:{url:req.body.image}}, function(err) {
                 if (err)
                     res.send(err);
                 else
                     res.json({ message: 'Article updated!' });
             });
+            
         })
-    })
         // Delete route
         .delete(function(req, res) {
             Article.remove({
-                _id: req.params.article_id
+                link: req.params.link
             }, function(err, article) {
                 if (err)
                     res.send(err);
